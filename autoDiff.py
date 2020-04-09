@@ -214,5 +214,8 @@ if __name__ == "__main__":
 			c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
 			auto_pool = Test_pool(strict=True, tests=generate(command(AUTO_TESTER)))
 			a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
+			count_errors(len(a_errors), a_total, "automatic")
+			for error in a_errors:
+				print(error)
 	else:
 		c_print("Source file doesn't exist", 'R')
