@@ -8,7 +8,7 @@ Simply add this repository to your workspace and after running for the first tim
 Type into terminal `python3 autoDiff.py yourfile.c`
 
 ## FAQ
-- **my program failed a test but I'm sure it's working!**<br>Some tests are set to strict, meaning they have one very specific output. If you think a test failed wrongly you can either fork with a fix or let me knoe & I'll fix it
+- **my program failed a test but I'm sure it's working!**<br>Some tests are set to strict, meaning they have one very specific output. If you think a test failed wrongly you can either fork with a fix or let me know & I'll fix it
 
 ### config.py
 ```
