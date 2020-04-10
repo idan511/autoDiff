@@ -61,13 +61,13 @@ TESTS = {
 	]),
 	"hard bad input": Test_pool(strict=False, tests=[
 		Test("best", "3888914775,Itzel Gardner,21345345345345,26,Iran,Tehran\nq\n",
-			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter\n"),
+			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter[\n\r]"),
 		Test("best", "3888914775,Itzel Gardner,4294967296,26,Iran,Tehran\nq\n",
-			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter\n"),
+			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter[\n\r]"),
 		Test("best", "3888914775,Itzel Gardner,21,26,Iran,Teh ran\nq\n",
-			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter\n"),
+			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter[\n\r]"),
 		Test("best", "3888914775,Itzel Gardner,21,26,Ir an,Tehran\nq\n",
-			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter\n")
+			expected_err=r"", expected_return=0, expected_out=r"Enter student info\. To exit press q, then enter\nERROR: [^\n\r]*[\n\r]in line 0[\n\r]Enter student info\. To exit press q, then enter[\n\r]")
 	]),
 	"looong list": Test_pool(strict=True, tests=[
 		Test("best", "3888914775,Itzel Gardner,21,26,Iran,Tehran\n5496060426,Korbin Murillo,4,30,Pakistan,Islamabad\n3845354610,Rhett Vargas,98,29,United-Kingdom,London\n" * 10 + "q\n"),
