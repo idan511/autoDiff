@@ -160,7 +160,7 @@ class Test:
 		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
 		strict_diff_out = "\n".join(diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
 		strict_diff_err = "\n".join(diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
-		return Error(self, "test error", str(actual) + "\n" + str(strict_expected))
+		return Error(self, "test error", "OUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
 		if strict_diff_out != "":
 			if strict:
 				return Error(self, "stdout error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
