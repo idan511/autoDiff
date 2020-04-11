@@ -162,7 +162,7 @@ class Test:
 		except:
 			print("args:", self.args, "\ninput:", self.input)
 			print("an error occured in your code:", sys.exc_info()[0])
-			print("Also, the program's output:\n",sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT).stdout, encoding='UTF-8')
+			print("Also, the program's output:\n", sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT).stdout)
 			exit(1)
 		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
 		strict_diff_out = "\n".join(diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
