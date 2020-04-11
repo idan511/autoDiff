@@ -156,11 +156,20 @@ class Test:
 		if not strict and (self.expected_out is None or self.expected_err is None or self.expected_return is None):
 			raise ValueError("test doesn't run strictly, but no expected out and err given\n" + str(self) + "\n" + str(self.expected_out)
 							 + "\n" + str(self.expected_err) + "\n" + str(self.expected_return))
-		actual = sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
-		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
+		actual = None
+		try:
+			actual = sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
+		except:
+			print("args:", self.args, "\ninput:", self.input)
+			print("an error occured in your code:", sys.exc_info()[0])
+			print("Also, the program's output:\n",sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT).stdout, encoding='UTF-8')
+			exit(1)
+		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
 		strict_diff_out = "\n".join(diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
 		strict_diff_err = "\n".join(diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
-		return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
+
+		# return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
+
 		if strict_diff_out != "":
 			if strict:
 				return Error(self, "stdout error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
