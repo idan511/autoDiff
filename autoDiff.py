@@ -215,11 +215,13 @@ if __name__ == "__main__":
 				shutil.copy2(relative(source), relative(UNCOMPILED_NAME))
 			sp.call("tar -cvf " + TAR_NAME + " " + UNCOMPILED_NAME, shell=True)
 			sp.call(pre_submit + " " + TAR_NAME, shell=True)
-			c_print("Running coding style tests", 'B')
+			c_print("Running coding style test", 'B')
 			sp.call(coding_style + " " + source, shell=True)
 			c_print("Compiling " + source + " as " + COMPILED_NAME, 'B')
 			sp.call("gcc -Wall -Wvla -Wextra -std=c99 -lm " + source + " -o " + COMPILED_NAME, shell=True)
-
+			c_print("Running memory leak test", 'B')
+			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
+		/*
 		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
 		count_errors(len(errors), total, "manual")
@@ -233,5 +235,6 @@ if __name__ == "__main__":
 			count_errors(len(a_errors), a_total, "automatic")
 			for error in a_errors:
 				print(error)
+		*/
 	else:
 		c_print("Source file doesn't exist", 'R')
