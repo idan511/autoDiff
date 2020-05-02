@@ -185,6 +185,8 @@ class Test:
 
 				if strict_diff_file != "":
 					if strict:
+						print(strict_expected.stdout)
+						print(actual_output)
 						return Error(self, "output error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
 					elif not bool(re.match(self.expected_out, actual.stdout, re.M)):
 						return Error(self, "output error", "expected:\n" + self.expected_out + "\nactual:\n" + actual.stdout)
