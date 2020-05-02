@@ -167,7 +167,7 @@ class Test:
 			if self.args == "n":
 				arg = ""
 			if self.args == "r":
-				arg = "fef24r2f"
+				arg = "fef24r2fna"
 			self.args = arg
 			actual = sp.run(args=src + " " + self.args, text=True, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
