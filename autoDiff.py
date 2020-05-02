@@ -158,27 +158,23 @@ class Test:
 		if not strict and (self.expected_out is None or self.expected_err is None or self.expected_return is None):
 			raise ValueError("test doesn't run strictly, but no expected out and err given\n" + str(self) + "\n" + str(self.expected_out)
 							 + "\n" + str(self.expected_err) + "\n" + str(self.expected_return))
-		tempInput = tempfile.temporaryFile()
-		tempInput.write(bytes(str(input), encoding='utf-8'))
-		tempInput.seek(0)
 
-		print(tempInput.read())
 		actual = None
-		try:
-			actual = sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
-		except UnicodeDecodeError:
-			print("CONGRATULATIONS! you just got UnicodeDecodeError! please print screen the following output:")
-			import locale
-			print("encoding:",locale.getpreferredencoding(True))
-			print(sp.run(args=src + " " + self.args, input=self.input, capture_output=True, shell=True))
-		except:
-			print("args:", self.args, "\ninput:", self.input)
-			print("an error occured in your code:", sys.exc_info()[0])
-			print("Also, the program's output:\n", sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT).stdout)
-			exit(1)
-		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
-		strict_diff_out = "\n".join(diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
-		strict_diff_err = "\n".join(diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
+		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
+			tempInput.writelines(str(self.input))
+			tempInput.seek(0)
+			sp.run(args=src + " " + tempInput.name, input=self.input, shell=True)
+			if not os.path.isfile(relative("railway_planner_output.txt")):
+				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
+			with "railway_planner_output.txt" as output:
+				actual = output
+
+		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
+
+		strict_diff_out = "\n".join(
+			diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
+		strict_diff_err = "\n".join(
+			diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
 
 		# return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
 
@@ -197,6 +193,7 @@ class Test:
 				return Error(self, "return code error", "expected: " + str(strict_expected.returncode) + "\nactual: " + str(actual.returncode))
 			elif self.expected_return != actual.returncode:
 				return Error(self, "return code error", "expected:\n" + str(self.expected_return) + "\nactual:\n" + str(actual.returncode))
+
 
 
 def reinput(q, answers):
@@ -229,11 +226,11 @@ if __name__ == "__main__":
 			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
 
 
-		#errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
+		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
-		#count_errors(len(errors), total, "manual")
-		#for error in errors:
-		#	print(error)
+		count_errors(len(errors), total, "manual")
+		for error in errors:
+			print(error)
 
 		#if auto_tester_enabled and errors == []:
 		#	c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
