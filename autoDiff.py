@@ -19,7 +19,7 @@ def command(tup):
 	return "(" + tup[0] + ")" + PLACEHOLDER + "(" + tup[1] + ")"
 
 t_count = 0
-if(auto_tester_enabled)
+if auto_tester_enabled:
 	t_count = count(command(AUTO_TESTER))
 DIR = "* = expected   - = actual\n"
 
