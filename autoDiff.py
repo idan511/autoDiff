@@ -159,10 +159,15 @@ class Test:
 		actual = None
 		try:
 			actual = sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
+		except UnicodeDecodeError:
+			print("CONGRATULATIONS! you just got UnicodeDecodeError! please print screen the following output:")
+			import locale
+			print("encoding:",locale.getpreferredencoding(True))
+			print(sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8'))
 		except:
 			print("args:", self.args, "\ninput:", self.input)
 			print("an error occured in your code:", sys.exc_info()[0])
-			print("Also, the program's output:\n", sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT).stdout)
+			print("Also, the program's output:\n", sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT, encoding='UTF-8').stdout)
 			exit(1)
 		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
 		strict_diff_out = "\n".join(diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))

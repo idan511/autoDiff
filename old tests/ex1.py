@@ -7,7 +7,7 @@ TESTS = {
 		Test("quick", "3888914775,Itzel Gardner,21,26,Iran,Tehran\n5496060426,Korbin Murillo,4,30,Pakistan,Islamabad\n3845354610,Rhett Vargas,98,29,United-Kingdom,London\nq\n")
 	]),
 	"bad args": Test_pool(strict=True, tests=[
-		Test("x", ""),
+		Test("best x", ""),
 		Test("x x", ""),
 		Test("", ""),
 	]),
