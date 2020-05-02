@@ -161,25 +161,32 @@ class Test:
 
 		actual = None
 		strict_expected = None
+		actual_output = None
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(self.input))
 			tempInput.seek(0)
-			sp.run(args=src + " " + tempInput.name, shell=True)
+			actual = sp.run(args=src + " " + tempInput.name, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
 			with open("railway_planner_output.txt", 'r') as output:
-				actual = output.read()
+				actual_output = output.read()
 
 			strict_expected = sp.run(args=reference + " " + tempInput.name, text=True, capture_output=True, shell=True)
 
-
+		strict_diff_file = "\n".join(
+			diff.context_diff(strict_expected.stdout.splitlines(), actual_output.splitlines(), lineterm=""))
 		strict_diff_out = "\n".join(
-			diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
+			diff.context_diff("", actual.stdout.splitlines(), lineterm=""))
 		strict_diff_err = "\n".join(
 			diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
 
 		# return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
 
+		if strict_diff_file != "":
+			if strict:
+				return Error(self, "output error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
+			elif not bool(re.match(self.expected_out, actual.stdout, re.M)):
+				return Error(self, "output error", "expected:\n" + self.expected_out + "\nactual:\n" + actual.stdout)
 		if strict_diff_out != "":
 			if strict:
 				return Error(self, "stdout error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
