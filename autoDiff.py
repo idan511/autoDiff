@@ -163,7 +163,7 @@ class Test:
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(self.input))
 			tempInput.seek(0)
-			actual = sp.run(args=src + " " + tempInput.name, shell=True)
+			actual = sp.run(args=src + " " + tempInput.name, text=True, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
 			with open("railway_planner_output.txt", 'r') as output:
