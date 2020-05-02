@@ -167,8 +167,8 @@ class Test:
 			sp.run(args=src + " " + tempInput.name, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
-			with "railway_planner_output.txt" as output:
-				actual = output
+			with open("railway_planner_output.txt", 'r') as output:
+				actual = output.read()
 
 			strict_expected = sp.run(args=reference + " " + tempInput.name, text=True, capture_output=True, shell=True)
 
