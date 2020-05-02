@@ -160,16 +160,18 @@ class Test:
 							 + "\n" + str(self.expected_err) + "\n" + str(self.expected_return))
 
 		actual = None
+		strict_expected = None
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(self.input))
 			tempInput.seek(0)
-			sp.run(args=src + " " + tempInput.name, input=self.input, shell=True)
+			sp.run(args=src + " " + tempInput.name, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
 			with "railway_planner_output.txt" as output:
 				actual = output
 
-		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
+			strict_expected = sp.run(args=reference + " " + tempInput.name, text=True, capture_output=True, shell=True)
+
 
 		strict_diff_out = "\n".join(
 			diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
