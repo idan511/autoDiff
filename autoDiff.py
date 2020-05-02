@@ -220,7 +220,7 @@ if __name__ == "__main__":
 			c_print("Compiling " + source + " as " + COMPILED_NAME, 'B')
 			sp.call("gcc -Wall -Wvla -Wextra -std=c99 -lm " + source + " -o " + COMPILED_NAME, shell=True)
 			c_print("Running memory leak test", 'B')
-			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
+			sp.call("valgrind --leak-check=full -v " + COMPILED_NAME, shell=True)
 
 
 		#errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
