@@ -6,6 +6,7 @@ from exrex import generate, count
 import re
 from tests import *
 import shutil
+import tempfile
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -157,18 +158,23 @@ class Test:
 		if not strict and (self.expected_out is None or self.expected_err is None or self.expected_return is None):
 			raise ValueError("test doesn't run strictly, but no expected out and err given\n" + str(self) + "\n" + str(self.expected_out)
 							 + "\n" + str(self.expected_err) + "\n" + str(self.expected_return))
+		tempInput = tempfile.temporaryFile()
+		tempInput.write(bytes(str(input), encoding='utf-8'))
+		tempInput.seek(0)
+
+		print(tempInput.read())
 		actual = None
 		try:
-			actual = sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
+			actual = sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
 		except UnicodeDecodeError:
 			print("CONGRATULATIONS! you just got UnicodeDecodeError! please print screen the following output:")
 			import locale
 			print("encoding:",locale.getpreferredencoding(True))
-			print(sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8'))
+			print(sp.run(args=src + " " + self.args, input=self.input, capture_output=True, shell=True))
 		except:
 			print("args:", self.args, "\ninput:", self.input)
 			print("an error occured in your code:", sys.exc_info()[0])
-			print("Also, the program's output:\n", sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT, encoding='UTF-8').stdout)
+			print("Also, the program's output:\n", sp.run(args=src + " " + self.args, input=self.input, shell=True, stdout=sp.PIPE, stderr=sp.STDOUT).stdout)
 			exit(1)
 		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True, encoding='UTF-8')
 		strict_diff_out = "\n".join(diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
