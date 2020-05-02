@@ -166,7 +166,8 @@ class Test:
 			arg = tempInput.name + self.args
 			if self.args == "n":
 				arg = ""
-			actual = sp.run(args=src + " " + arg, text=True, capture_output=True, shell=True)
+			self.args = arg
+			actual = sp.run(args=src + " " + self.args, text=True, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
 			with open("railway_planner_output.txt", 'r') as output:
