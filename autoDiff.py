@@ -221,20 +221,21 @@ if __name__ == "__main__":
 			sp.call("gcc -Wall -Wvla -Wextra -std=c99 -lm " + source + " -o " + COMPILED_NAME, shell=True)
 			c_print("Running memory leak test", 'B')
 			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
-		/*
-		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
-		count_errors(len(errors), total, "manual")
-		for error in errors:
-			print(error)
 
-		if auto_tester_enabled and errors == []:
-			c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
-			auto_pool = Test_pool(strict=True, tests=generate(command(AUTO_TESTER)))
-			a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
-			count_errors(len(a_errors), a_total, "automatic")
-			for error in a_errors:
-				print(error)
-		*/
+		#errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
+
+		#count_errors(len(errors), total, "manual")
+		#for error in errors:
+		#	print(error)
+
+		#if auto_tester_enabled and errors == []:
+		#	c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
+		#	auto_pool = Test_pool(strict=True, tests=generate(command(AUTO_TESTER)))
+		#	a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
+		#	count_errors(len(a_errors), a_total, "automatic")
+		#	for error in a_errors:
+		#		print(error)
+
 	else:
 		c_print("Source file doesn't exist", 'R')
