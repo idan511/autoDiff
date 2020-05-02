@@ -173,7 +173,7 @@ class Test:
 			with open("railway_planner_output.txt", 'r') as output:
 				actual_output = output.read()
 
-				strict_expected = sp.run(args=reference + " " + tempInput.name, text=True, capture_output=True, shell=True)
+				strict_expected = sp.run(args=reference + " " + self.args, text=True, capture_output=True, shell=True)
 
 				strict_diff_file = "\n".join(
 					diff.context_diff(strict_expected.stdout.splitlines(), actual_output.splitlines(), lineterm=""))
