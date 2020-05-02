@@ -164,7 +164,7 @@ class Test:
 			tempInput.writelines(str(self.input))
 			tempInput.seek(0)
 			arg = tempInput.name + self.args
-			if self.args = "n":
+			if self.args == "n":
 				arg = ""
 			actual = sp.run(args=src + " " + arg, text=True, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
