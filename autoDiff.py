@@ -6,6 +6,7 @@ from exrex import generate, count
 import re
 from tests import *
 import shutil
+import tempfile
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -18,8 +19,9 @@ from config import *
 def command(tup):
 	return "(" + tup[0] + ")" + PLACEHOLDER + "(" + tup[1] + ")"
 
-
-t_count = count(command(AUTO_TESTER))
+t_count = 0
+if auto_tester_enabled:
+	t_count = count(command(AUTO_TESTER))
 DIR = "* = expected   - = actual\n"
 
 
@@ -156,25 +158,57 @@ class Test:
 		if not strict and (self.expected_out is None or self.expected_err is None or self.expected_return is None):
 			raise ValueError("test doesn't run strictly, but no expected out and err given\n" + str(self) + "\n" + str(self.expected_out)
 							 + "\n" + str(self.expected_err) + "\n" + str(self.expected_return))
-		actual = sp.run(args=src + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
-		strict_expected = sp.run(args=reference + " " + self.args, input=self.input, text=True, capture_output=True, shell=True)
-		strict_diff_out = "\n".join(diff.context_diff(strict_expected.stdout.splitlines(), actual.stdout.splitlines(), lineterm=""))
-		strict_diff_err = "\n".join(diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
-		if strict_diff_out != "":
-			if strict:
-				return Error(self, "stdout error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
-			elif not bool(re.match(self.expected_out, actual.stdout, re.M)):
-				return Error(self, "stdout error", "expected:\n" + self.expected_out + "\nactual:\n" + actual.stdout)
-		if strict_diff_err != "":
-			if strict:
-				return Error(self, "stderr error", DIR + "\n".join(strict_diff_err.split("\n")[3:]))
-			elif not bool(re.match(self.expected_err, actual.stderr, re.M)):
-				return Error(self, "stderr error", "expected:\n" + self.expected_err + "\nactual:\n" + actual.stderr)
-		if actual.returncode != strict_expected.returncode:
-			if strict:
-				return Error(self, "return code error", "expected: " + str(strict_expected.returncode) + "\nactual: " + str(actual.returncode))
-			elif self.expected_return != actual.returncode:
-				return Error(self, "return code error", "expected:\n" + str(self.expected_return) + "\nactual:\n" + str(actual.returncode))
+
+
+		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
+			tempInput.writelines(str(self.input))
+			tempInput.seek(0)
+			arg = tempInput.name + self.args
+			if self.args == "n":
+				arg = ""
+			if self.args == "r":
+				arg = "fef24r2fna"
+			self.args = arg
+			actual = sp.run(args=src + " " + self.args, text=True, capture_output=True, shell=True)
+			if not os.path.isfile(relative("railway_planner_output.txt")):
+				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
+			with open("railway_planner_output.txt", 'r') as output:
+				actual_output = output.read()
+
+				strict_expected = sp.run(args=reference + " " + self.args, text=True, capture_output=True, shell=True)
+
+				strict_diff_file = "\n".join(
+					diff.context_diff(strict_expected.stdout.splitlines(), actual_output.splitlines(), lineterm=""))
+				strict_diff_out = "\n".join(
+					diff.context_diff("", actual.stdout.splitlines(), lineterm=""))
+				strict_diff_err = "\n".join(
+					diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
+
+				# return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
+
+				if strict_diff_file != "":
+					if strict:
+						print(strict_expected.stdout)
+						print(actual_output)
+						return Error(self, "output error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
+					elif not bool(re.match(self.expected_out, actual.stdout, re.M)):
+						return Error(self, "output error", "expected:\n" + self.expected_out + "\nactual:\n" + actual.stdout)
+				if strict_diff_out != "":
+					if strict:
+						return Error(self, "stdout error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
+					elif not bool(re.match(self.expected_out, actual.stdout, re.M)):
+						return Error(self, "stdout error", "expected:\n" + self.expected_out + "\nactual:\n" + actual.stdout)
+				if strict_diff_err != "":
+					if strict:
+						return Error(self, "stderr error", DIR + "\n".join(strict_diff_err.split("\n")[3:]))
+					elif not bool(re.match(self.expected_err, actual.stderr, re.M)):
+						return Error(self, "stderr error", "expected:\n" + self.expected_err + "\nactual:\n" + actual.stderr)
+				if actual.returncode != strict_expected.returncode:
+					if strict:
+						return Error(self, "return code error", "expected: " + str(strict_expected.returncode) + "\nactual: " + str(actual.returncode))
+					elif self.expected_return != actual.returncode:
+						return Error(self, "return code error", "expected:\n" + str(self.expected_return) + "\nactual:\n" + str(actual.returncode))
+
 
 
 def reinput(q, answers):
@@ -199,10 +233,13 @@ if __name__ == "__main__":
 				shutil.copy2(relative(source), relative(UNCOMPILED_NAME))
 			sp.call("tar -cvf " + TAR_NAME + " " + UNCOMPILED_NAME, shell=True)
 			sp.call(pre_submit + " " + TAR_NAME, shell=True)
-			c_print("Running coding style tests", 'B')
+			c_print("Running coding style test", 'B')
 			sp.call(coding_style + " " + source, shell=True)
 			c_print("Compiling " + source + " as " + COMPILED_NAME, 'B')
 			sp.call("gcc -Wall -Wvla -Wextra -std=c99 -lm " + source + " -o " + COMPILED_NAME, shell=True)
+			c_print("Running memory leak test", 'B')
+			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
+
 
 		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
@@ -210,12 +247,13 @@ if __name__ == "__main__":
 		for error in errors:
 			print(error)
 
-		if auto_tester_enabled and errors == []:
-			c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
-			auto_pool = Test_pool(strict=True, tests=generate(command(AUTO_TESTER)))
-			a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
-			count_errors(len(a_errors), a_total, "automatic")
-			for error in a_errors:
-				print(error)
+		#if auto_tester_enabled and errors == []:
+		#	c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
+		#	auto_pool = Test_pool(strict=True, tests=generate(command(AUTO_TESTER)))
+		#	a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
+		#	count_errors(len(a_errors), a_total, "automatic")
+		#	for error in a_errors:
+		#		print(error)
+
 	else:
 		c_print("Source file doesn't exist", 'R')
