@@ -230,7 +230,11 @@ def runTimer(src, reference, pattern, prefix="", suffix="", n=100):
 			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=15)
 			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=15)
 			ratio = expected_time/actual_time
-			print("n =", n, "   expected(n) =" , round(expected_time, 4), "   actual(n) =", round(actual_time, 4), "   (" + str(round(100*ratio)) + "% efficiency)")
+			'{:<30}'.format('left aligned')
+			print('{:<15}'.format("n = " + str(n)) +
+				  '{:<22}'.format("expected(n) = " + str(round(expected_time, 4))) +
+				  '{:<22}'.format("actual(n) =" + str(round(actual_time, 4))) +
+				  '{:<20}'.format("(" + str(round(100*ratio)) + "% efficiency)"))
 			time_table.append(ratio)
 		n *= 2
 
@@ -241,7 +245,7 @@ def runTimer(src, reference, pattern, prefix="", suffix="", n=100):
 	elif mean < 100:
 		ch = 'Y'
 	c_print("Average efficiency is " + str(mean) + "%", ch)
-	med = round(100*median(time_table))
+	med = round(100 * median(time_table))
 	ch = 'G'
 	if med < 50:
 		ch = 'R'
