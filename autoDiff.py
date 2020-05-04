@@ -18,6 +18,7 @@ if auto_tester_enabled:
 	t_count = count(AUTO_TESTER)
 
 DIR = "* = expected   - = actual\n"
+DECODING = "ascii"
 
 
 def run_tests(tests, source, reference, force_strict, leng=None):
@@ -165,20 +166,20 @@ class Test:
 			if self.args == "r":
 				arg = "fef24r2fna"
 			self.args = arg
-			actual = sp.run(args=src + " " + self.args, text=True, capture_output=True, shell=True)
+			actual = sp.run(args=src + " " + self.args, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
-			with open("railway_planner_output.txt", 'r') as output:
+			with open("railway_planner_output.txt", 'r', encoding=DECODING) as output:
 				actual_output = output.read()
 
-				strict_expected = sp.run(args=reference + " " + self.args, text=True, capture_output=True, shell=True)
+				strict_expected = sp.run(args=reference + " " + self.args, capture_output=True, shell=True)
 
 				strict_diff_file = "\n".join(
-					diff.context_diff(strict_expected.stdout.splitlines(), actual_output.splitlines(), lineterm=""))
+					diff.context_diff(strict_expected.stdout.decode(DECODING).splitlines(), actual_output.splitlines(), lineterm=""))
 				strict_diff_out = "\n".join(
-					diff.context_diff("", actual.stdout.splitlines(), lineterm=""))
+					diff.context_diff("", actual.stdout.decode(DECODING).splitlines(), lineterm=""))
 				strict_diff_err = "\n".join(
-					diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
+					diff.context_diff(strict_expected.stderr.decode(DECODING).splitlines(), actual.stderr.decode(DECODING).splitlines(), lineterm=""))
 
 				# return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
 
