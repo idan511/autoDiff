@@ -239,8 +239,7 @@ if __name__ == "__main__":
 			c_print("Running memory leak test", 'B')
 			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
 
-
-		c_print("┅┅┅┅┅┅┅ Done with official tests! now running student tests ┅┅┅┅┅┅┅")
+		c_print("┅┅┅┅┅┅┅ Done with official tests! now running student tests ┅┅┅┅┅┅┅", 'M')
 
 		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
