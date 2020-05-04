@@ -219,7 +219,7 @@ def runTimer(src, reference):
 	suffix = ""
 	pattern = "c,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n"
 	timeTable = []
-	for i in [1000, 5000, 10000, 50000, 100000]:
+	for i in [1000, 5000, 10000, 50000, 100000, 500000]:
 		test = prefix + pattern * i + suffix
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(test))
