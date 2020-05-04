@@ -181,6 +181,9 @@ class Test:
 				strict_diff_err = "\n".join(
 					diff.context_diff(strict_expected.stderr.decode(DECODING).splitlines(), actual.stderr.decode(DECODING).splitlines(), lineterm=""))
 
+
+				print(strict_expected.stdout.decode(DECODING).splitlines())
+				print(actual_output.splitlines())
 				# return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
 
 				if strict_diff_file != "":
