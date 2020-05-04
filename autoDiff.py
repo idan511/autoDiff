@@ -173,7 +173,7 @@ class Test:
 			actual = sp.run(args=src + " " + self.args, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
-			with open("railway_planner_output.txt", 'r', encoding='DECODING') as output:
+			with open("railway_planner_output.txt", 'r', encoding=DECODING) as output:
 				actual_output = output.read()
 
 				strict_expected = sp.run(args=reference + " " + self.args, capture_output=True, shell=True)
