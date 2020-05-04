@@ -8,6 +8,7 @@ from tests import *
 import shutil
 import tempfile
 import timeit
+from statistics import median
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -214,15 +215,16 @@ def wrapper(func, *args, **kwargs):
 		return func(*args, **kwargs)
 	return wrapped
 
-def runTimer(src, reference):
+def runTimer(src, reference, n=100):
 	prefix = "7\n4\na,b,c,d\n"
 	suffix = ""
 	pattern = "c,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n"
-	timeTable = []
-	i = 100
+	time_table = []
+	n = 100
 	expected_time = 0
-	while expected_time < 60:
-		test = prefix + pattern * i + suffix
+	actual_time = 0
+	while expected_time < 60 and actual_time < 60:
+		test = prefix + pattern * n + suffix
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(test))
 			tempInput.seek(0)
@@ -230,10 +232,18 @@ def runTimer(src, reference):
 			ac = wrapper(sp.run, args=src + " " + tempInput.name, capture_output=True, shell=True)
 			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=15)
 			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=15)
-			print("n =", i, "   expected(n) =" , round(expected_time, 4), "   actual(n) =", round(actual_time, 4), "(" + str(round(100*expected_time/actual_time)) + "% efficiency)")
-			timeTable.append((i, expected_time/actual_time))
-		i *= 2
-	return timeTable
+			ratio = expected_time/actual_time
+			print("n =", n, "   expected(n) =" , round(expected_time, 4), "   actual(n) =", round(actual_time, 4), "   (" + str(round(100*ratio)) + "% efficiency)")
+			time_table.append(ratio)
+		n *= 2
+
+	med = round(100*median(time_table))
+	ch = 'G'
+	if med < 50:
+		ch = 'R'
+	elif med < 100:
+		ch = 'Y'
+	c_print("Median efficiency is " + str(med) + "%", ch)
 
 
 def reinput(q, answers):
@@ -280,8 +290,9 @@ if __name__ == "__main__":
 		#	count_errors(len(a_errors), a_total, "automatic")
 		#	for error in a_errors:
 		#		print(error)
-		c_print("\n════════ Done with tests! now running time complexity test ════════\n", 'M')
 
-		print(runTimer(COMPILED_NAME, REFERENCE))
+		c_print("\n════════ Done with tests! now running time complexity test ════════\n", 'M')
+		runTimer(COMPILED_NAME, REFERENCE)
+
 	else:
 		c_print("Source file doesn't exist", 'R')
