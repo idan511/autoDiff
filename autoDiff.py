@@ -7,22 +7,18 @@ import re
 from tests import *
 import shutil
 import tempfile
+import timeit
+import statistics as st
+from defaults import *
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-if not os.path.isfile(dir_path + "/config.py"):
-	shutil.copy2(dir_path + "/defaults.py", dir_path + "/config.py")
-
-from config import *
-
-
-def command(tup):
-	return "(" + tup[0] + ")" + PLACEHOLDER + "(" + tup[1] + ")"
-
 t_count = 0
 if auto_tester_enabled:
-	t_count = count(command(AUTO_TESTER))
+	t_count = count(AUTO_TESTER)
+
 DIR = "* = expected   - = actual\n"
+DECODING = "ascii"
 
 
 def run_tests(tests, source, reference, force_strict, leng=None):
@@ -170,20 +166,20 @@ class Test:
 			if self.args == "r":
 				arg = "fef24r2fna"
 			self.args = arg
-			actual = sp.run(args=src + " " + self.args, text=True, capture_output=True, shell=True)
+			actual = sp.run(args=src + " " + self.args, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
-			with open("railway_planner_output.txt", 'r') as output:
+			with open("railway_planner_output.txt", 'r', encoding=DECODING) as output:
 				actual_output = output.read()
 
-				strict_expected = sp.run(args=reference + " " + self.args, text=True, capture_output=True, shell=True)
+				strict_expected = sp.run(args=reference + " " + self.args, capture_output=True, shell=True)
 
 				strict_diff_file = "\n".join(
-					diff.context_diff(strict_expected.stdout.splitlines(), actual_output.splitlines(), lineterm=""))
+					diff.context_diff(strict_expected.stdout.decode(DECODING).splitlines(), actual_output.splitlines(), lineterm=""))
 				strict_diff_out = "\n".join(
-					diff.context_diff("", actual.stdout.splitlines(), lineterm=""))
+					diff.context_diff("", actual.stdout.decode(DECODING).splitlines(), lineterm=""))
 				strict_diff_err = "\n".join(
-					diff.context_diff(strict_expected.stderr.splitlines(), actual.stderr.splitlines(), lineterm=""))
+					diff.context_diff(strict_expected.stderr.decode(DECODING).splitlines(), actual.stderr.decode(DECODING).splitlines(), lineterm=""))
 
 				# return Error(self, "test error", str(strict_expected) + "\nOUT:\n" + strict_diff_out + "\nERR:\n" + strict_diff_err)
 
@@ -208,6 +204,48 @@ class Test:
 					elif self.expected_return != actual.returncode:
 						return Error(self, "return code error", "expected:\n" + str(self.expected_return) + "\nactual:\n" + str(actual.returncode))
 
+def wrapper(func, *args, **kwargs):
+	def wrapped():
+		return func(*args, **kwargs)
+	return wrapped
+
+def runTimer(src, reference, pattern, prefix="", suffix="", n=100, time_limit=60):
+
+	time_table = []
+	expected_time = 0
+	actual_time = 0
+	while expected_time < time_limit and actual_time < time_limit:
+		test = prefix + pattern * n + suffix
+		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
+			tempInput.writelines(str(test))
+			tempInput.seek(0)
+			ex = wrapper(sp.run, args=reference + " " + tempInput.name, capture_output=True, shell=True)
+			ac = wrapper(sp.run, args=src + " " + tempInput.name, capture_output=True, shell=True)
+			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=15)
+			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=15)
+			ratio = expected_time/actual_time
+			'{:<30}'.format('left aligned')
+			print('{:<15}'.format("n = " + str(n)) +
+				  '{:<24}'.format("expected(n) = " + str(round(expected_time, 4))) +
+				  '{:<24}'.format("actual(n) = " + str(round(actual_time, 4))) +
+				  '{:<22}'.format("(" + str(round(100*ratio)) + "% efficiency)"))
+			time_table.append(ratio)
+		n *= 2
+
+	mean = round(100 * st.mean(time_table))
+	ch = 'G'
+	if mean < 50:
+		ch = 'R'
+	elif mean < 100:
+		ch = 'Y'
+	c_print("Average efficiency is " + str(mean) + "%", ch)
+	med = round(100 * st.median(time_table))
+	ch = 'G'
+	if med < 50:
+		ch = 'R'
+	elif med < 100:
+		ch = 'Y'
+	c_print("Median efficiency is " + str(med) + "%", ch)
 
 
 def reinput(q, answers):
@@ -239,7 +277,7 @@ if __name__ == "__main__":
 			c_print("Running memory leak test", 'B')
 			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
 
-		c_print("════════ Done with official tests! now running student tests ════════", 'M')
+		c_print("\n════════ Done with official tests! now running student tests ════════\n", 'M')
 
 		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
@@ -247,13 +285,16 @@ if __name__ == "__main__":
 		for error in errors:
 			print(error)
 
-		#if auto_tester_enabled and errors == []:
-		#	c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
-		#	auto_pool = Test_pool(strict=True, tests=generate(command(AUTO_TESTER)))
-		#	a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
-		#	count_errors(len(a_errors), a_total, "automatic")
-		#	for error in a_errors:
-		#		print(error)
+		if auto_tester_enabled and errors == []:
+			c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
+			auto_pool = Test_pool(strict=True, tests=generate(AUTO_TESTER))
+			a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
+			count_errors(len(a_errors), a_total, "automatic")
+			for error in a_errors:
+				print(error)
+
+		c_print("\n════════ Done with tests! now running time complexity analysis ════════\n", 'M')
+		runTimer(COMPILED_NAME, REFERENCE, PATTERN, PREFIX, SUFFIX)
 
 	else:
 		c_print("Source file doesn't exist", 'R')
