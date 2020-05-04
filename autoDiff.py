@@ -17,13 +17,10 @@ if not os.path.isfile(dir_path + "/config.py"):
 
 from config import *
 
-
-def command(tup):
-	return "(" + tup[0] + ")" + PLACEHOLDER + "(" + tup[1] + ")"
-
 t_count = 0
 if auto_tester_enabled:
-	t_count = count(command(AUTO_TESTER))
+	t_count = count(AUTO_TESTER)
+
 DIR = "* = expected   - = actual\n"
 
 
@@ -291,15 +288,15 @@ if __name__ == "__main__":
 		for error in errors:
 			print(error)
 
-		#if auto_tester_enabled and errors == []:
-		#	c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
-		#	auto_pool = Test_pool(strict=True, tests=generate(command(AUTO_TESTER)))
-		#	a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
-		#	count_errors(len(a_errors), a_total, "automatic")
-		#	for error in a_errors:
-		#		print(error)
+		if auto_tester_enabled and errors == []:
+			c_print("autotester is calculating " + str(t_count) + " tests, please be patient!", 'B')
+			auto_pool = Test_pool(strict=True, tests=generate(AUTO_TESTER))
+			a_errors, a_total = run_tests({"automatic": auto_pool}, COMPILED_NAME, REFERENCE, True, t_count)
+			count_errors(len(a_errors), a_total, "automatic")
+			for error in a_errors:
+				print(error)
 
-		c_print("\n════════ Done with tests! now running time complexity test ════════\n", 'M')
+		c_print("\n════════ Done with tests! now running time complexity analysis ════════\n", 'M')
 		runTimer(COMPILED_NAME, REFERENCE, PATTERN, PREFIX, SUFFIX)
 
 	else:
