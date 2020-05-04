@@ -228,7 +228,7 @@ def runTimer(src, reference):
 			ac = wrapper(sp.run, args=src + " " + tempInput.name, capture_output=True, shell=True)
 			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=15)
 			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=15)
-			print("n =", i, "   expected(n) =" , expected_time, "   actual(n) =", actual_time, "(" + str(round(expected_time/actual_time)) + "% efficiency)")
+			print("n =", i, "   expected(n) =" , expected_time, "   actual(n) =", actual_time, "(" + str(round(100*expected_time/actual_time)) + "% efficiency)")
 			timeTable.append((i, expected_time/actual_time))
 	return timeTable
 
