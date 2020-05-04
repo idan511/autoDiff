@@ -219,7 +219,9 @@ def runTimer(src, reference):
 	suffix = ""
 	pattern = "c,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n"
 	timeTable = []
-	for i in [1000, 5000, 10000, 50000, 100000, 500000]:
+	i = 100
+	expected_time = 0
+	while expected_time < 60:
 		test = prefix + pattern * i + suffix
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(test))
@@ -228,8 +230,9 @@ def runTimer(src, reference):
 			ac = wrapper(sp.run, args=src + " " + tempInput.name, capture_output=True, shell=True)
 			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=15)
 			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=15)
-			print("n =", i, "   expected(n) =" , expected_time, "   actual(n) =", actual_time, "(" + str(round(100*expected_time/actual_time)) + "% efficiency)")
+			print("n =", i, "   expected(n) =" , round(expected_time, 4), "   actual(n) =", round(actual_time, 4), "(" + str(round(100*expected_time/actual_time)) + "% efficiency)")
 			timeTable.append((i, expected_time/actual_time))
+		i *= 2
 	return timeTable
 
 
@@ -262,7 +265,7 @@ if __name__ == "__main__":
 			c_print("Running memory leak test", 'B')
 			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
 
-		c_print("════════ Done with official tests! now running student tests ════════", 'M')
+		c_print("\n════════ Done with official tests! now running student tests ════════\n", 'M')
 
 		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
@@ -277,7 +280,7 @@ if __name__ == "__main__":
 		#	count_errors(len(a_errors), a_total, "automatic")
 		#	for error in a_errors:
 		#		print(error)
-		c_print("════════ Done with tests! now running time complexity test ════════", 'M')
+		c_print("\n════════ Done with tests! now running time complexity test ════════\n", 'M')
 
 		print(runTimer(COMPILED_NAME, REFERENCE))
 	else:
