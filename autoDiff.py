@@ -7,6 +7,7 @@ import re
 from tests import *
 import shutil
 import tempfile
+import timeit
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -208,6 +209,26 @@ class Test:
 					elif self.expected_return != actual.returncode:
 						return Error(self, "return code error", "expected:\n" + str(self.expected_return) + "\nactual:\n" + str(actual.returncode))
 
+def wrapper(func, *args, **kwargs):
+	def wrapped():
+		return func(*args, **kwargs)
+	return wrapped
+
+def runTimer(src, reference):
+	pattern = generate("7\n4\n(a,b,c,d\nc,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n){100,1000,10000,50000}")
+	timeTable = []
+	for test in pattern:
+		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
+			tempInput.writelines(str(test))
+			tempInput.seek(0)
+			ex = wrapper(sp.run, args=reference + " " + tempInput.name, shell=True)
+			ac = wrapper(sp.run, args=src + " " + tempInput.name, shell=True)
+			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=10)
+			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=10)
+			print(expected_time, actual_time)
+			print(expected_time/actual_time)
+			timeTable.append((expected_time, actual_time))
+	return timeTable
 
 
 def reinput(q, answers):
@@ -254,6 +275,6 @@ if __name__ == "__main__":
 		#	count_errors(len(a_errors), a_total, "automatic")
 		#	for error in a_errors:
 		#		print(error)
-
+		print(runTimer(COMPILED_NAME, REFERENCE))
 	else:
 		c_print("Source file doesn't exist", 'R')
