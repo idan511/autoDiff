@@ -218,6 +218,7 @@ def runTimer(src, reference):
 	pattern = generate("7\n4\n(a,b,c,d\nc,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n){100,1000,10000,50000}")
 	timeTable = []
 	for test in pattern:
+		print(test)
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(test))
 			tempInput.seek(0)
