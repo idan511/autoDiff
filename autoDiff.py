@@ -215,9 +215,9 @@ def wrapper(func, *args, **kwargs):
 	return wrapped
 
 def runTimer(src, reference):
-	prefix = "7\n4\n"
+	prefix = "7\n4\na,b,c,d\n"
 	suffix = ""
-	pattern = "a,b,c,d\nc,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n"
+	pattern = "c,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n"
 	timeTable = []
 	for i in [100, 1000, 5000, 10000]:
 		test = prefix + pattern * i + suffix
