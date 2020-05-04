@@ -232,9 +232,9 @@ def runTimer(src, reference, pattern, prefix="", suffix="", n=100, time_limit=60
 			ratio = expected_time/actual_time
 			'{:<30}'.format('left aligned')
 			print('{:<15}'.format("n = " + str(n)) +
-				  '{:<22}'.format("expected(n) = " + str(round(expected_time, 4))) +
-				  '{:<22}'.format("actual(n) = " + str(round(actual_time, 4))) +
-				  '{:<20}'.format("(" + str(round(100*ratio)) + "% efficiency)"))
+				  '{:<24}'.format("expected(n) = " + str(round(expected_time, 4))) +
+				  '{:<24}'.format("actual(n) = " + str(round(actual_time, 4))) +
+				  '{:<22}'.format("(" + str(round(100*ratio)) + "% efficiency)"))
 			time_table.append(ratio)
 		n *= 2
 
