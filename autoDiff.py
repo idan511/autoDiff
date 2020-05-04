@@ -8,7 +8,7 @@ from tests import *
 import shutil
 import tempfile
 import timeit
-from statistics import median, mean
+import statistics as st
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -238,14 +238,14 @@ def runTimer(src, reference, pattern, prefix="", suffix="", n=100):
 			time_table.append(ratio)
 		n *= 2
 
-	mean = round(100 * mean(time_table))
+	mean = round(100 * st.mean(time_table))
 	ch = 'G'
 	if mean < 50:
 		ch = 'R'
 	elif mean < 100:
 		ch = 'Y'
 	c_print("Average efficiency is " + str(mean) + "%", ch)
-	med = round(100 * median(time_table))
+	med = round(100 * st.median(time_table))
 	ch = 'G'
 	if med < 50:
 		ch = 'R'
