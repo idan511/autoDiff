@@ -59,7 +59,8 @@ def c_str(str, c):
 		'Y': "\033[93m{}\033[00m",
 		'B': "\033[96m{}\033[00m",
 		'G': "\033[92m{}\033[00m",
-		'R': "\033[91m{}\033[00m"
+		'R': "\033[91m{}\033[00m",
+		'M': "\033[35m{}\033[00m"
 	}
 	if c not in colors.keys():
 		return str
@@ -238,6 +239,8 @@ if __name__ == "__main__":
 			c_print("Running memory leak test", 'B')
 			sp.call("valgrind --leak-check=full " + COMPILED_NAME, shell=True)
 
+
+		c_print("┅┅┅┅┅┅┅ Done with official tests! now running student tests ┅┅┅┅┅┅┅")
 
 		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
