@@ -219,17 +219,16 @@ def runTimer(src, reference):
 	suffix = ""
 	pattern = "c,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n"
 	timeTable = []
-	for i in [100, 1000, 5000, 10000]:
+	for i in [1000, 5000, 10000, 50000, 100000]:
 		test = prefix + pattern * i + suffix
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(test))
 			tempInput.seek(0)
 			ex = wrapper(sp.run, args=reference + " " + tempInput.name, capture_output=True, shell=True)
 			ac = wrapper(sp.run, args=src + " " + tempInput.name, capture_output=True, shell=True)
-			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=10)
-			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=10)
-			print(expected_time, actual_time)
-			print(expected_time/actual_time)
+			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=15)
+			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=15)
+			print("n =", i, "   expected(n) =" , expected_time, "   actual(n) =", actual_time, "(" + str(round(expected_time/actual_time)) + "% efficiency)")
 			timeTable.append((i, expected_time/actual_time))
 	return timeTable
 
@@ -278,6 +277,8 @@ if __name__ == "__main__":
 		#	count_errors(len(a_errors), a_total, "automatic")
 		#	for error in a_errors:
 		#		print(error)
+		c_print("════════ Done with tests! now running time complexity test ════════", 'M')
+
 		print(runTimer(COMPILED_NAME, REFERENCE))
 	else:
 		c_print("Source file doesn't exist", 'R')
