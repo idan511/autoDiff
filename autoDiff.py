@@ -215,12 +215,12 @@ def wrapper(func, *args, **kwargs):
 		return func(*args, **kwargs)
 	return wrapped
 
-def runTimer(src, reference, pattern, prefix="", suffix="", n=100):
+def runTimer(src, reference, pattern, prefix="", suffix="", n=100, time_limit=60):
 
 	time_table = []
 	expected_time = 0
 	actual_time = 0
-	while expected_time < 60 and actual_time < 60:
+	while expected_time < time_limit and actual_time < time_limit:
 		test = prefix + pattern * n + suffix
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(test))
