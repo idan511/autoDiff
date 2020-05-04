@@ -8,7 +8,7 @@ from tests import *
 import shutil
 import tempfile
 import timeit
-from statistics import median
+from statistics import median, mean
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -215,12 +215,9 @@ def wrapper(func, *args, **kwargs):
 		return func(*args, **kwargs)
 	return wrapped
 
-def runTimer(src, reference, n=100):
-	prefix = "7\n4\na,b,c,d\n"
-	suffix = ""
-	pattern = "c,d,3,17\na,d,2,16\nd,b,3,21\na,a,3,13\na,a,1,22\nc,a,3,25\na,b,2,27\n"
+def runTimer(src, reference, pattern, prefix="", suffix="", n=100):
+
 	time_table = []
-	n = 100
 	expected_time = 0
 	actual_time = 0
 	while expected_time < 60 and actual_time < 60:
@@ -237,6 +234,13 @@ def runTimer(src, reference, n=100):
 			time_table.append(ratio)
 		n *= 2
 
+	mean = round(100 * mean(time_table))
+	ch = 'G'
+	if mean < 50:
+		ch = 'R'
+	elif mean < 100:
+		ch = 'Y'
+	c_print("Average efficiency is " + str(mean) + "%", ch)
 	med = round(100*median(time_table))
 	ch = 'G'
 	if med < 50:
@@ -292,7 +296,7 @@ if __name__ == "__main__":
 		#		print(error)
 
 		c_print("\n════════ Done with tests! now running time complexity test ════════\n", 'M')
-		runTimer(COMPILED_NAME, REFERENCE)
+		runTimer(COMPILED_NAME, REFERENCE, PATTERN, PREFIX, SUFFIX)
 
 	else:
 		c_print("Source file doesn't exist", 'R')
