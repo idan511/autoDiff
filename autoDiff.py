@@ -9,13 +9,9 @@ import shutil
 import tempfile
 import timeit
 import statistics as st
+from defaults import *
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-
-if not os.path.isfile(dir_path + "/config.py"):
-	shutil.copy2(dir_path + "/defaults.py", dir_path + "/config.py")
-
-from config import *
 
 t_count = 0
 if auto_tester_enabled:

@@ -8,7 +8,7 @@ DEFAULT_SOURCE = "main.c"
 auto_tester_enabled = False
 OVERFLOW_ABORT = 100  # 0 == off
 PLACEHOLDER = ""
-AUTO_TESTER = ("")
+AUTO_TESTER = ""
 
 # compiler settings
 TO_COMPILE = ('.c')
