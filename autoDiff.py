@@ -169,13 +169,13 @@ class Test:
 			if self.args == "r":
 				arg = "fef24r2fna"
 			self.args = arg
-			actual = sp.run(args=src + " " + self.args, text=True, capture_output=True, shell=True)
+			actual = sp.run(args=src + " " + self.args, capture_output=True, shell=True)
 			if not os.path.isfile(relative("railway_planner_output.txt")):
 				return Error(self, "no file error", "program didn't create 'railway_planner_output.txt'")
 			with open("railway_planner_output.txt", 'r') as output:
 				actual_output = output.read()
 
-				strict_expected = sp.run(args=reference + " " + self.args, text=True, capture_output=True, shell=True)
+				strict_expected = sp.run(args=reference + " " + self.args, capture_output=True, shell=True)
 
 				strict_diff_file = "\n".join(
 					diff.context_diff(strict_expected.stdout.splitlines(), actual_output.splitlines(), lineterm=""))
@@ -188,8 +188,6 @@ class Test:
 
 				if strict_diff_file != "":
 					if strict:
-						print(strict_expected.stdout)
-						print(actual_output)
 						return Error(self, "output error", DIR + "\n".join(strict_diff_out.split("\n")[3:]))
 					elif not bool(re.match(self.expected_out, actual.stdout, re.M)):
 						return Error(self, "output error", "expected:\n" + self.expected_out + "\nactual:\n" + actual.stdout)
