@@ -7,7 +7,7 @@ DEFAULT_SOURCE = "main.c"
 # auto test settings
 auto_tester_enabled = False
 OVERFLOW_ABORT = 100  # 0 == off
-PLACEHOLDER = "§§§±±±§§§"
+PLACEHOLDER = ""
 AUTO_TESTER = ("")
 
 # compiler settings
