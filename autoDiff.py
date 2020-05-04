@@ -224,7 +224,7 @@ def runTimer(src, reference):
 		with tempfile.NamedTemporaryFile(mode='w+t') as tempInput:
 			tempInput.writelines(str(test))
 			tempInput.seek(0)
-			ex = wrapper(sp.run, args=reference + " " + tempInput.name, capture_output=False, shell=True)
+			ex = wrapper(sp.run, args=reference + " " + tempInput.name, capture_output=True, shell=True)
 			ac = wrapper(sp.run, args=src + " " + tempInput.name, capture_output=True, shell=True)
 			expected_time = timeit.timeit(ex, setup="import subprocess as sp", number=10)
 			actual_time = timeit.timeit(ac, setup="import subprocess as sp", number=10)
