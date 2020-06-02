@@ -265,11 +265,11 @@ if __name__ == "__main__":
 		source = sys.argv[1]
 	if os.path.isfile(relative(source)):
 		if source.endswith(TO_COMPILE):
-			c_print("Running pre-submit tests", 'B')
+			#c_print("Running pre-submit tests", 'B')
 			if relative(source) != relative(UNCOMPILED_NAME):
 				shutil.copy2(relative(source), relative(UNCOMPILED_NAME))
-			sp.call("tar -cvf " + TAR_NAME + " " + UNCOMPILED_NAME, shell=True)
-			sp.call(pre_submit + " " + TAR_NAME, shell=True)
+			#sp.call("tar -cvf " + TAR_NAME + " " + UNCOMPILED_NAME, shell=True)
+			#sp.call(pre_submit + " " + TAR_NAME, shell=True)
 			c_print("Running coding style test", 'B')
 			sp.call(coding_style + " " + source, shell=True)
 			c_print("Compiling " + source + " as " + COMPILED_NAME, 'B')
