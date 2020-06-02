@@ -279,6 +279,7 @@ if __name__ == "__main__":
 
 		c_print("\n════════ Done with official tests! now running student tests ════════\n", 'M')
 
+		exit(0)
 		errors, total = run_tests(TESTS, COMPILED_NAME, REFERENCE, FORCE_STRICT)
 
 		count_errors(len(errors), total, "manual")
